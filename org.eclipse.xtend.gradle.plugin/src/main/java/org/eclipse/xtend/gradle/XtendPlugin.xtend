@@ -1,59 +1,54 @@
 package org.eclipse.xtend.gradle
 
-import java.io.File
-import org.apache.log4j.BasicConfigurator
-import org.eclipse.xtend.core.XtendInjectorSingleton
-import org.eclipse.xtend.core.compiler.batch.XtendBatchCompiler
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.logging.LogLevel
+import org.gradle.api.internal.project.ProjectInternal
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.tasks.compile.JavaCompile
+import org.gradle.api.tasks.ProjectSourceSet
 
 /** 
  * @author Dennis Huebner
  */
 class XtendPlugin implements Plugin<Project> {
-	var File xtendSrcDir
-	var File xtendGenTargetDir
-	var File xtendTempDir
+	val String COMPILER_TASK = 'compileXtend'
+	val String PLUGIN_NAME = 'xtend'
 
-	override apply(Project it) {
-		plugins.apply(typeof(JavaPlugin))
-		xtendSrcDir = file('src/main/java')
-		xtendGenTargetDir = file('build/xtend-gen')
-		xtendTempDir = file('build/xtend-temp')
+	override apply(Project project) {
+		project.plugins.apply(typeof(JavaPlugin))
+		val xtendPluginConvention = new XtendPluginConvention(project as ProjectInternal)
+		project.convention.plugins.put(PLUGIN_NAME, xtendPluginConvention)
+		configureSourceSets(xtendPluginConvention)
+		configureCompiler(xtendPluginConvention)
+		configureBuild(project)
+	}
+	
+	def configureSourceSets(XtendPluginConvention convention) {
+		val srcSet  = convention.project.extensions.getByType(typeof(ProjectSourceSet))
+		srcSet.getByName('main').getByName('java').source.srcDir(convention.xtendGenTargetDir)
+	}
+
+	def configureBuild(Project it) {
 		var javaCompilerTasks = tasks.withType(typeof(JavaCompile))
 		if (javaCompilerTasks.empty) {
 			throw new GradleException(
 				'compilerXtend task depends on missing ' + JavaPlugin::COMPILE_JAVA_TASK_NAME + ' task. Build failed');
 		}
 		val javaCompile = javaCompilerTasks.iterator.next
-		var task = task('compileXtend')
-		task.inputs.dir(xtendSrcDir)
-		task.outputs.dir(xtendGenTargetDir)
-		task.doLast(
-			[
-				BasicConfigurator::configure
-				var injector = XtendInjectorSingleton::INJECTOR
-				var compiler = injector.getInstance(typeof(XtendBatchCompiler))
-				var classpath = project.configurations.findByName('compile').asPath
-				compiler.sourcePath = xtendSrcDir.absolutePath
-				compiler.outputPath = xtendGenTargetDir.absolutePath
-				compiler.classPath = classpath
-				compiler.tempDirectory = xtendTempDir.absolutePath
-				var encoding = javaCompile.options.encoding
-				if (encoding != null) {
-					compiler.fileEncoding = encoding
-				}
-				println('Encoding: ' + compiler.fileEncoding)
-				if (!compiler.compile) {
-					throw new GradleException('Xtend compilation failed.');
-				}
-				logger.log(LogLevel::INFO, "Miau!")
-			]
-		)
+		var task = tasks.add(COMPILER_TASK, typeof(CompileXtendTask))
 		javaCompile.dependsOn.add(task)
 	}
+
+	def configureCompiler(XtendPluginConvention it) {
+		project.tasks.withType(typeof(CompileXtendTask)).all(
+			[task|task.getConventionMapping().map("xtendSrcDir", [|xtendSrcDir])])
+			
+		project.tasks.withType(typeof(CompileXtendTask)).all(
+			[task|task.getConventionMapping().map("xtendTempDir", [|xtendTempDir])])
+			
+		project.tasks.withType(typeof(CompileXtendTask)).all(
+			[task|task.getConventionMapping().map("xtendGenTargetDir", [|xtendGenTargetDir])])
+	}
+
 }

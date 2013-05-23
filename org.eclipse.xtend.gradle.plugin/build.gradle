@@ -17,6 +17,15 @@ sourceSets {
 	}
 }
 
+eclipse {
+	project {
+		natures 'org.eclipse.xtext.ui.shared.xtextNature'
+		buildCommand 'org.eclipse.xtext.ui.shared.xtextBuilder'
+	}
+}
+
+//test.debug=true
+
 dependencies {
 	repositories {  mavenCentral() }
 
