@@ -1,0 +1,6 @@
+*._trace
+/build
+/.gradle
+/bin
+/.settings
+/.classpath
