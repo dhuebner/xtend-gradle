@@ -9,15 +9,12 @@ class XtendPluginConvention {
 
 	String encoding
 
-	String xtendSrcDirName
-
 	String xtendGenTargetDirName
 
 	String xtendTempDirName
 
 	new(ProjectInternal it) {
 		this.project = it
-		xtendSrcDirName = 'java'
 		xtendGenTargetDirName = 'xtend-gen'
 		xtendTempDirName = 'xtend-temp'
 	}
@@ -28,10 +25,6 @@ class XtendPluginConvention {
 
 	def String getEncoding() {
 		encoding
-	}
-
-	def File getXtendSrcDir() {
-		project.file('src/main/' + xtendSrcDirName)
 	}
 
 	def File getXtendGenTargetDir() {

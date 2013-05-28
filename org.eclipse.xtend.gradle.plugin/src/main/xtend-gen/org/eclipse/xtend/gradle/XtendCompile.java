@@ -6,20 +6,22 @@ import java.io.File;
 import org.apache.log4j.BasicConfigurator;
 import org.eclipse.xtend.core.XtendInjectorSingleton;
 import org.eclipse.xtend.core.compiler.batch.XtendBatchCompiler;
+import org.eclipse.xtext.xbase.lib.Functions.Function1;
 import org.eclipse.xtext.xbase.lib.InputOutput;
+import org.eclipse.xtext.xbase.lib.IterableExtensions;
 import org.gradle.api.GradleException;
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.artifacts.ConfigurationContainer;
-import org.gradle.api.internal.ConventionTask;
+import org.gradle.api.file.FileTree;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.plugins.JavaPlugin;
-import org.gradle.api.tasks.InputDirectory;
 import org.gradle.api.tasks.OutputDirectory;
 import org.gradle.api.tasks.TaskAction;
+import org.gradle.api.tasks.compile.AbstractCompile;
 
 @SuppressWarnings("all")
-public class CompileXtendTask extends ConventionTask {
+public class XtendCompile extends AbstractCompile {
   private String _encoding;
   
   public String getEncoding() {
@@ -28,17 +30,6 @@ public class CompileXtendTask extends ConventionTask {
   
   public void setEncoding(final String encoding) {
     this._encoding = encoding;
-  }
-  
-  @InputDirectory
-  private File _xtendSrcDir;
-  
-  public File getXtendSrcDir() {
-    return this._xtendSrcDir;
-  }
-  
-  public void setXtendSrcDir(final File xtendSrcDir) {
-    this._xtendSrcDir = xtendSrcDir;
   }
   
   @OutputDirectory
@@ -71,16 +62,22 @@ public class CompileXtendTask extends ConventionTask {
     ConfigurationContainer _configurations = _project.getConfigurations();
     Configuration _findByName = _configurations.findByName(JavaPlugin.COMPILE_CONFIGURATION_NAME);
     String classpath = _findByName.getAsPath();
-    File _xtendSrcDir = this.getXtendSrcDir();
-    String _absolutePath = _xtendSrcDir.getAbsolutePath();
-    compiler.setSourcePath(_absolutePath);
+    FileTree _source = this.getSource();
+    final Function1<File,String> _function = new Function1<File,String>() {
+        public String apply(final File it) {
+          String _absolutePath = it.getAbsolutePath();
+          return _absolutePath;
+        }
+      };
+    String _join = IterableExtensions.<File>join(_source, File.pathSeparator, _function);
+    compiler.setSourcePath(_join);
     File _xtendGenTargetDir = this.getXtendGenTargetDir();
-    String _absolutePath_1 = _xtendGenTargetDir.getAbsolutePath();
-    compiler.setOutputPath(_absolutePath_1);
+    String _absolutePath = _xtendGenTargetDir.getAbsolutePath();
+    compiler.setOutputPath(_absolutePath);
     compiler.setClassPath(classpath);
     File _xtendTempDir = this.getXtendTempDir();
-    String _absolutePath_2 = _xtendTempDir.getAbsolutePath();
-    compiler.setTempDirectory(_absolutePath_2);
+    String _absolutePath_1 = _xtendTempDir.getAbsolutePath();
+    compiler.setTempDirectory(_absolutePath_1);
     String _encoding = this.getEncoding();
     boolean _notEquals = (!Objects.equal(_encoding, null));
     if (_notEquals) {

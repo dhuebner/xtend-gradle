@@ -5,25 +5,24 @@ import org.apache.log4j.BasicConfigurator
 import org.eclipse.xtend.core.XtendInjectorSingleton
 import org.eclipse.xtend.core.compiler.batch.XtendBatchCompiler
 import org.gradle.api.GradleException
-import org.gradle.api.internal.ConventionTask
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
-import org.gradle.api.tasks.InputDirectory
+import org.gradle.api.tasks.compile.AbstractCompile
 
-class CompileXtendTask extends ConventionTask {
+class XtendCompile extends AbstractCompile {
 	@Property String encoding
-	@Property @InputDirectory File xtendSrcDir
 	@Property @OutputDirectory File xtendGenTargetDir
 	@Property File xtendTempDir
 
-	@TaskAction
-	def protected void compile() {
+    @TaskAction
+	override protected void compile() {
 		BasicConfigurator::configure
 		var injector = XtendInjectorSingleton::INJECTOR
 		var compiler = injector.getInstance(typeof(XtendBatchCompiler))
 		var classpath = project.configurations.findByName(JavaPlugin::COMPILE_CONFIGURATION_NAME).asPath
-		compiler.sourcePath = xtendSrcDir.absolutePath
+		
+		compiler.sourcePath = source.join(File::pathSeparator,[absolutePath])
 		compiler.outputPath = xtendGenTargetDir.absolutePath
 		compiler.classPath = classpath
 		compiler.tempDirectory = xtendTempDir.absolutePath

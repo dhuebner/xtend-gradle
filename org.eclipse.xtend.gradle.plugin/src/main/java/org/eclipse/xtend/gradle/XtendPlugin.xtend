@@ -23,9 +23,9 @@ class XtendPlugin implements Plugin<Project> {
 		configureCompiler(xtendPluginConvention)
 		configureBuild(project)
 	}
-	
+
 	def configureSourceSets(XtendPluginConvention convention) {
-		val srcSet  = convention.project.extensions.getByType(typeof(ProjectSourceSet))
+		val srcSet = convention.project.extensions.getByType(typeof(ProjectSourceSet))
 		srcSet.getByName('main').getByName('java').source.srcDir(convention.xtendGenTargetDir)
 	}
 
@@ -36,18 +36,16 @@ class XtendPlugin implements Plugin<Project> {
 				'compilerXtend task depends on missing ' + JavaPlugin::COMPILE_JAVA_TASK_NAME + ' task. Build failed');
 		}
 		val javaCompile = javaCompilerTasks.iterator.next
-		var task = tasks.add(COMPILER_TASK, typeof(CompileXtendTask))
+		var task = tasks.add(COMPILER_TASK, typeof(XtendCompile))
 		javaCompile.dependsOn.add(task)
 	}
 
 	def configureCompiler(XtendPluginConvention it) {
-		project.tasks.withType(typeof(CompileXtendTask)).all(
-			[task|task.getConventionMapping().map("xtendSrcDir", [|xtendSrcDir])])
-			
-		project.tasks.withType(typeof(CompileXtendTask)).all(
+
+		project.tasks.withType(typeof(XtendCompile)).all(
 			[task|task.getConventionMapping().map("xtendTempDir", [|xtendTempDir])])
-			
-		project.tasks.withType(typeof(CompileXtendTask)).all(
+
+		project.tasks.withType(typeof(XtendCompile)).all(
 			[task|task.getConventionMapping().map("xtendGenTargetDir", [|xtendGenTargetDir])])
 	}
 

@@ -5,7 +5,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
-import org.eclipse.xtend.gradle.CompileXtendTask;
+import org.eclipse.xtend.gradle.XtendCompile;
 import org.eclipse.xtend.gradle.XtendPluginConvention;
 import org.gradle.api.Action;
 import org.gradle.api.GradleException;
@@ -79,7 +79,7 @@ public class XtendPlugin implements Plugin<Project> {
       Iterator<JavaCompile> _iterator = javaCompilerTasks.iterator();
       final JavaCompile javaCompile = _iterator.next();
       TaskContainer _tasks_1 = it.getTasks();
-      CompileXtendTask task = _tasks_1.<CompileXtendTask>add(this.COMPILER_TASK, CompileXtendTask.class);
+      XtendCompile task = _tasks_1.<XtendCompile>add(this.COMPILER_TASK, XtendCompile.class);
       Set<Object> _dependsOn = javaCompile.getDependsOn();
       boolean _add = _dependsOn.add(task);
       _xblockexpression = (_add);
@@ -90,25 +90,9 @@ public class XtendPlugin implements Plugin<Project> {
   public void configureCompiler(final XtendPluginConvention it) {
     ProjectInternal _project = it.getProject();
     TaskContainerInternal _tasks = _project.getTasks();
-    TaskCollection<CompileXtendTask> _withType = _tasks.<CompileXtendTask>withType(CompileXtendTask.class);
-    final Action<CompileXtendTask> _function = new Action<CompileXtendTask>() {
-        public void execute(final CompileXtendTask task) {
-          ConventionMapping _conventionMapping = task.getConventionMapping();
-          final Callable<File> _function = new Callable<File>() {
-              public File call() throws Exception {
-                File _xtendSrcDir = it.getXtendSrcDir();
-                return _xtendSrcDir;
-              }
-            };
-          _conventionMapping.map("xtendSrcDir", _function);
-        }
-      };
-    _withType.all(_function);
-    ProjectInternal _project_1 = it.getProject();
-    TaskContainerInternal _tasks_1 = _project_1.getTasks();
-    TaskCollection<CompileXtendTask> _withType_1 = _tasks_1.<CompileXtendTask>withType(CompileXtendTask.class);
-    final Action<CompileXtendTask> _function_1 = new Action<CompileXtendTask>() {
-        public void execute(final CompileXtendTask task) {
+    TaskCollection<XtendCompile> _withType = _tasks.<XtendCompile>withType(XtendCompile.class);
+    final Action<XtendCompile> _function = new Action<XtendCompile>() {
+        public void execute(final XtendCompile task) {
           ConventionMapping _conventionMapping = task.getConventionMapping();
           final Callable<File> _function = new Callable<File>() {
               public File call() throws Exception {
@@ -119,12 +103,12 @@ public class XtendPlugin implements Plugin<Project> {
           _conventionMapping.map("xtendTempDir", _function);
         }
       };
-    _withType_1.all(_function_1);
-    ProjectInternal _project_2 = it.getProject();
-    TaskContainerInternal _tasks_2 = _project_2.getTasks();
-    TaskCollection<CompileXtendTask> _withType_2 = _tasks_2.<CompileXtendTask>withType(CompileXtendTask.class);
-    final Action<CompileXtendTask> _function_2 = new Action<CompileXtendTask>() {
-        public void execute(final CompileXtendTask task) {
+    _withType.all(_function);
+    ProjectInternal _project_1 = it.getProject();
+    TaskContainerInternal _tasks_1 = _project_1.getTasks();
+    TaskCollection<XtendCompile> _withType_1 = _tasks_1.<XtendCompile>withType(XtendCompile.class);
+    final Action<XtendCompile> _function_1 = new Action<XtendCompile>() {
+        public void execute(final XtendCompile task) {
           ConventionMapping _conventionMapping = task.getConventionMapping();
           final Callable<File> _function = new Callable<File>() {
               public File call() throws Exception {
@@ -135,6 +119,6 @@ public class XtendPlugin implements Plugin<Project> {
           _conventionMapping.map("xtendGenTargetDir", _function);
         }
       };
-    _withType_2.all(_function_2);
+    _withType_1.all(_function_1);
   }
 }

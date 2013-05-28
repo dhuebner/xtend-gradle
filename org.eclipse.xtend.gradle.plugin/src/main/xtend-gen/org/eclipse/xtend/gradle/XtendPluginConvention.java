@@ -10,15 +10,12 @@ public class XtendPluginConvention {
   
   private String encoding;
   
-  private String xtendSrcDirName;
-  
   private String xtendGenTargetDirName;
   
   private String xtendTempDirName;
   
   public XtendPluginConvention(final ProjectInternal it) {
     this.project = it;
-    this.xtendSrcDirName = "java";
     this.xtendGenTargetDirName = "xtend-gen";
     this.xtendTempDirName = "xtend-temp";
   }
@@ -29,12 +26,6 @@ public class XtendPluginConvention {
   
   public String getEncoding() {
     return this.encoding;
-  }
-  
-  public File getXtendSrcDir() {
-    String _plus = ("src/main/" + this.xtendSrcDirName);
-    File _file = this.project.file(_plus);
-    return _file;
   }
   
   public File getXtendGenTargetDir() {
