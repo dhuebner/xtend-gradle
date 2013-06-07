@@ -5,34 +5,40 @@ import org.apache.log4j.BasicConfigurator
 import org.eclipse.xtend.core.XtendInjectorSingleton
 import org.eclipse.xtend.core.compiler.batch.XtendBatchCompiler
 import org.gradle.api.GradleException
-import org.gradle.api.plugins.JavaPlugin
+import org.gradle.api.file.ConfigurableFileTree
+import org.gradle.api.file.FileCollection
 import org.gradle.api.tasks.OutputDirectory
+import org.gradle.api.tasks.SourceTask
 import org.gradle.api.tasks.TaskAction
-import org.gradle.api.tasks.compile.AbstractCompile
 
-class XtendCompile extends AbstractCompile {
+class XtendCompile extends SourceTask {
 	@Property String encoding
 	@Property @OutputDirectory File xtendGenTargetDir
 	@Property File xtendTempDir
+	@Property FileCollection classpath
 
-    @TaskAction
-	override protected void compile() {
+	@TaskAction
+	def protected void compile() {
 		BasicConfigurator::configure
 		var injector = XtendInjectorSingleton::INJECTOR
-		var compiler = injector.getInstance(typeof(XtendBatchCompiler))
-		var classpath = project.configurations.findByName(JavaPlugin::COMPILE_CONFIGURATION_NAME).asPath
-		
-		compiler.sourcePath = source.join(File::pathSeparator,[absolutePath])
+		val compiler = injector.getInstance(typeof(XtendBatchCompiler))
+		val sourceDir = getSource as ConfigurableFileTree
+
+		logger.info('Source: ' + sourceDir.dir.absolutePath)
+		logger.info('outputPath: ' + xtendGenTargetDir.absolutePath)
+		logger.info('classPath: ' + classpath.asPath)
+		logger.info('Encoding: ' + compiler.fileEncoding)
+
+		compiler.sourcePath = sourceDir.dir.absolutePath
 		compiler.outputPath = xtendGenTargetDir.absolutePath
-		compiler.classPath = classpath
+		compiler.classPath = classpath.asPath
 		compiler.tempDirectory = xtendTempDir.absolutePath
 		if (encoding != null) {
 			compiler.fileEncoding = encoding
 		}
-		println('Encoding: ' + compiler.fileEncoding)
 		if (!compiler.compile) {
 			throw new GradleException('Xtend compilation failed.');
 		}
-		logger.info("Miau!")
+		logger.info("org.eclipse.xtend.gradle.XtendCompile.compile")
 	}
 }

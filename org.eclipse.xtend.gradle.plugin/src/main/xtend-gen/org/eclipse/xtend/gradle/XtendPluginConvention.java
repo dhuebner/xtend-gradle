@@ -1,12 +1,23 @@
 package org.eclipse.xtend.gradle;
 
 import java.io.File;
+import org.gradle.api.file.FileCollection;
 import org.gradle.api.internal.file.FileResolver;
 import org.gradle.api.internal.project.ProjectInternal;
 
 @SuppressWarnings("all")
 public class XtendPluginConvention {
   private final ProjectInternal project;
+  
+  private FileCollection _xtendSrcDirs;
+  
+  public FileCollection getXtendSrcDirs() {
+    return this._xtendSrcDirs;
+  }
+  
+  public void setXtendSrcDirs(final FileCollection xtendSrcDirs) {
+    this._xtendSrcDirs = xtendSrcDirs;
+  }
   
   private String encoding;
   
@@ -16,7 +27,7 @@ public class XtendPluginConvention {
   
   public XtendPluginConvention(final ProjectInternal it) {
     this.project = it;
-    this.xtendGenTargetDirName = "xtend-gen";
+    this.xtendGenTargetDirName = "generated-src/xtend-gen";
     this.xtendTempDirName = "xtend-temp";
   }
   

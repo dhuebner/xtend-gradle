@@ -1,11 +1,14 @@
 package org.eclipse.xtend.gradle
 
 import java.io.File
+import org.gradle.api.file.FileCollection
 import org.gradle.api.internal.project.ProjectInternal
 
 class XtendPluginConvention {
 
 	val ProjectInternal project
+
+	@Property FileCollection xtendSrcDirs
 
 	String encoding
 
@@ -15,7 +18,7 @@ class XtendPluginConvention {
 
 	new(ProjectInternal it) {
 		this.project = it
-		xtendGenTargetDirName = 'xtend-gen'
+		xtendGenTargetDirName = 'generated-src/xtend-gen'
 		xtendTempDirName = 'xtend-temp'
 	}
 

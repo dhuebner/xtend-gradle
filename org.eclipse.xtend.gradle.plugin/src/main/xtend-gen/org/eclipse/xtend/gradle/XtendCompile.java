@@ -6,22 +6,17 @@ import java.io.File;
 import org.apache.log4j.BasicConfigurator;
 import org.eclipse.xtend.core.XtendInjectorSingleton;
 import org.eclipse.xtend.core.compiler.batch.XtendBatchCompiler;
-import org.eclipse.xtext.xbase.lib.Functions.Function1;
-import org.eclipse.xtext.xbase.lib.InputOutput;
-import org.eclipse.xtext.xbase.lib.IterableExtensions;
 import org.gradle.api.GradleException;
-import org.gradle.api.Project;
-import org.gradle.api.artifacts.Configuration;
-import org.gradle.api.artifacts.ConfigurationContainer;
+import org.gradle.api.file.ConfigurableFileTree;
+import org.gradle.api.file.FileCollection;
 import org.gradle.api.file.FileTree;
 import org.gradle.api.logging.Logger;
-import org.gradle.api.plugins.JavaPlugin;
 import org.gradle.api.tasks.OutputDirectory;
+import org.gradle.api.tasks.SourceTask;
 import org.gradle.api.tasks.TaskAction;
-import org.gradle.api.tasks.compile.AbstractCompile;
 
 @SuppressWarnings("all")
-public class XtendCompile extends AbstractCompile {
+public class XtendCompile extends SourceTask {
   private String _encoding;
   
   public String getEncoding() {
@@ -53,47 +48,67 @@ public class XtendCompile extends AbstractCompile {
     this._xtendTempDir = xtendTempDir;
   }
   
+  private FileCollection _classpath;
+  
+  public FileCollection getClasspath() {
+    return this._classpath;
+  }
+  
+  public void setClasspath(final FileCollection classpath) {
+    this._classpath = classpath;
+  }
+  
   @TaskAction
   protected void compile() {
     BasicConfigurator.configure();
     Injector injector = XtendInjectorSingleton.INJECTOR;
-    XtendBatchCompiler compiler = injector.<XtendBatchCompiler>getInstance(XtendBatchCompiler.class);
-    Project _project = this.getProject();
-    ConfigurationContainer _configurations = _project.getConfigurations();
-    Configuration _findByName = _configurations.findByName(JavaPlugin.COMPILE_CONFIGURATION_NAME);
-    String classpath = _findByName.getAsPath();
+    final XtendBatchCompiler compiler = injector.<XtendBatchCompiler>getInstance(XtendBatchCompiler.class);
     FileTree _source = this.getSource();
-    final Function1<File,String> _function = new Function1<File,String>() {
-        public String apply(final File it) {
-          String _absolutePath = it.getAbsolutePath();
-          return _absolutePath;
-        }
-      };
-    String _join = IterableExtensions.<File>join(_source, File.pathSeparator, _function);
-    compiler.setSourcePath(_join);
+    final ConfigurableFileTree sourceDir = ((ConfigurableFileTree) _source);
+    Logger _logger = this.getLogger();
+    File _dir = sourceDir.getDir();
+    String _absolutePath = _dir.getAbsolutePath();
+    String _plus = ("Source: " + _absolutePath);
+    _logger.info(_plus);
+    Logger _logger_1 = this.getLogger();
     File _xtendGenTargetDir = this.getXtendGenTargetDir();
-    String _absolutePath = _xtendGenTargetDir.getAbsolutePath();
-    compiler.setOutputPath(_absolutePath);
-    compiler.setClassPath(classpath);
+    String _absolutePath_1 = _xtendGenTargetDir.getAbsolutePath();
+    String _plus_1 = ("outputPath: " + _absolutePath_1);
+    _logger_1.info(_plus_1);
+    Logger _logger_2 = this.getLogger();
+    FileCollection _classpath = this.getClasspath();
+    String _asPath = _classpath.getAsPath();
+    String _plus_2 = ("classPath: " + _asPath);
+    _logger_2.info(_plus_2);
+    Logger _logger_3 = this.getLogger();
+    String _fileEncoding = compiler.getFileEncoding();
+    String _plus_3 = ("Encoding: " + _fileEncoding);
+    _logger_3.info(_plus_3);
+    File _dir_1 = sourceDir.getDir();
+    String _absolutePath_2 = _dir_1.getAbsolutePath();
+    compiler.setSourcePath(_absolutePath_2);
+    File _xtendGenTargetDir_1 = this.getXtendGenTargetDir();
+    String _absolutePath_3 = _xtendGenTargetDir_1.getAbsolutePath();
+    compiler.setOutputPath(_absolutePath_3);
+    FileCollection _classpath_1 = this.getClasspath();
+    String _asPath_1 = _classpath_1.getAsPath();
+    compiler.setClassPath(_asPath_1);
     File _xtendTempDir = this.getXtendTempDir();
-    String _absolutePath_1 = _xtendTempDir.getAbsolutePath();
-    compiler.setTempDirectory(_absolutePath_1);
+    String _absolutePath_4 = _xtendTempDir.getAbsolutePath();
+    compiler.setTempDirectory(_absolutePath_4);
     String _encoding = this.getEncoding();
     boolean _notEquals = (!Objects.equal(_encoding, null));
     if (_notEquals) {
       String _encoding_1 = this.getEncoding();
       compiler.setFileEncoding(_encoding_1);
     }
-    String _fileEncoding = compiler.getFileEncoding();
-    String _plus = ("Encoding: " + _fileEncoding);
-    InputOutput.<String>println(_plus);
     boolean _compile = compiler.compile();
     boolean _not = (!_compile);
     if (_not) {
       GradleException _gradleException = new GradleException("Xtend compilation failed.");
       throw _gradleException;
     }
-    Logger _logger = this.getLogger();
-    _logger.info("Miau!");
+    Logger _logger_4 = this.getLogger();
+    _logger_4.info("org.eclipse.xtend.gradle.XtendCompile.compile");
   }
 }
