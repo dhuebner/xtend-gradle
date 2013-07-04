@@ -1,0 +1,43 @@
+
+buildscript {
+	def xtendVersion = '2.4.2'
+	project.version = xtendVersion
+	
+	repositories {
+		mavenCentral()
+		maven {
+			url "https://oss.sonatype.org/content/repositories/orgeclipsextend-1001/"
+		}
+		flatDir name:':org.eclipse.xtend.gradle.plugin:',dirs:'/Users/dhuebner/git/xtend-gradle/org.eclipse.xtend.gradle.plugin/build/libs'
+	}
+
+	dependencies {
+		classpath 'org.eclipse.xtend:org.eclipse.xtend.standalone:'+ xtendVersion
+		classpath 'org.apache.logging.log4j:log4j:2.0-beta6'
+		classpath 'com.google.inject:guice:3.0'
+		classpath project(':org.eclipse.xtend.gradle.plugin')
+	}
+}
+
+apply plugin: 'java'
+apply plugin: 'xtend'
+apply plugin: 'eclipse'
+
+repositories {
+	mavenCentral()
+	maven {
+		url "https://oss.sonatype.org/content/repositories/snapshots/"
+	}
+}
+
+dependencies {
+	compile 'org.eclipse.xtend:org.eclipse.xtend.lib:' + project.version
+}
+
+eclipse {
+	project {
+		natures 'org.eclipse.xtext.ui.shared.xtextNature'
+		buildCommand 'org.eclipse.xtext.ui.shared.xtextBuilder'
+	}
+}
+
