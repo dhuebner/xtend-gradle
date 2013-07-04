@@ -3,13 +3,15 @@ package org.eclipse.xtend.gradle;
 import com.google.common.base.Objects;
 import com.google.inject.Injector;
 import java.io.File;
+import java.util.Set;
 import org.apache.log4j.BasicConfigurator;
 import org.eclipse.xtend.core.XtendInjectorSingleton;
 import org.eclipse.xtend.core.compiler.batch.XtendBatchCompiler;
+import org.eclipse.xtext.xbase.lib.Functions.Function1;
+import org.eclipse.xtext.xbase.lib.IterableExtensions;
 import org.gradle.api.GradleException;
-import org.gradle.api.file.ConfigurableFileTree;
 import org.gradle.api.file.FileCollection;
-import org.gradle.api.file.FileTree;
+import org.gradle.api.file.SourceDirectorySet;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.tasks.OutputDirectory;
 import org.gradle.api.tasks.SourceTask;
@@ -58,22 +60,28 @@ public class XtendCompile extends SourceTask {
     this._classpath = classpath;
   }
   
+  private SourceDirectorySet sourceSet;
+  
   @TaskAction
   protected void compile() {
     BasicConfigurator.configure();
     Injector injector = XtendInjectorSingleton.INJECTOR;
     final XtendBatchCompiler compiler = injector.<XtendBatchCompiler>getInstance(XtendBatchCompiler.class);
-    FileTree _source = this.getSource();
-    final ConfigurableFileTree sourceDir = ((ConfigurableFileTree) _source);
+    Set<File> _srcDirs = this.sourceSet.getSrcDirs();
+    final Function1<File,String> _function = new Function1<File,String>() {
+        public String apply(final File it) {
+          String _absolutePath = it.getAbsolutePath();
+          return _absolutePath;
+        }
+      };
+    final String sourceDir = IterableExtensions.<File>join(_srcDirs, File.pathSeparator, _function);
     Logger _logger = this.getLogger();
-    File _dir = sourceDir.getDir();
-    String _absolutePath = _dir.getAbsolutePath();
-    String _plus = ("Source: " + _absolutePath);
+    String _plus = ("Source: " + sourceDir);
     _logger.info(_plus);
     Logger _logger_1 = this.getLogger();
     File _xtendGenTargetDir = this.getXtendGenTargetDir();
-    String _absolutePath_1 = _xtendGenTargetDir.getAbsolutePath();
-    String _plus_1 = ("outputPath: " + _absolutePath_1);
+    String _absolutePath = _xtendGenTargetDir.getAbsolutePath();
+    String _plus_1 = ("outputPath: " + _absolutePath);
     _logger_1.info(_plus_1);
     Logger _logger_2 = this.getLogger();
     FileCollection _classpath = this.getClasspath();
@@ -84,18 +92,16 @@ public class XtendCompile extends SourceTask {
     String _fileEncoding = compiler.getFileEncoding();
     String _plus_3 = ("Encoding: " + _fileEncoding);
     _logger_3.info(_plus_3);
-    File _dir_1 = sourceDir.getDir();
-    String _absolutePath_2 = _dir_1.getAbsolutePath();
-    compiler.setSourcePath(_absolutePath_2);
+    compiler.setSourcePath(sourceDir);
     File _xtendGenTargetDir_1 = this.getXtendGenTargetDir();
-    String _absolutePath_3 = _xtendGenTargetDir_1.getAbsolutePath();
-    compiler.setOutputPath(_absolutePath_3);
+    String _absolutePath_1 = _xtendGenTargetDir_1.getAbsolutePath();
+    compiler.setOutputPath(_absolutePath_1);
     FileCollection _classpath_1 = this.getClasspath();
     String _asPath_1 = _classpath_1.getAsPath();
     compiler.setClassPath(_asPath_1);
     File _xtendTempDir = this.getXtendTempDir();
-    String _absolutePath_4 = _xtendTempDir.getAbsolutePath();
-    compiler.setTempDirectory(_absolutePath_4);
+    String _absolutePath_2 = _xtendTempDir.getAbsolutePath();
+    compiler.setTempDirectory(_absolutePath_2);
     String _encoding = this.getEncoding();
     boolean _notEquals = (!Objects.equal(_encoding, null));
     if (_notEquals) {
@@ -110,5 +116,21 @@ public class XtendCompile extends SourceTask {
     }
     Logger _logger_4 = this.getLogger();
     _logger_4.info("org.eclipse.xtend.gradle.XtendCompile.compile");
+  }
+  
+  public void setSource(final Object source) {
+    if ((source instanceof SourceDirectorySet)) {
+      this.setSourceSet(((SourceDirectorySet) source));
+    } else {
+      String _simpleName = SourceDirectorySet.class.getSimpleName();
+      String _plus = ("source should be at least a " + _simpleName);
+      IllegalArgumentException _illegalArgumentException = new IllegalArgumentException(_plus);
+      throw _illegalArgumentException;
+    }
+  }
+  
+  public void setSourceSet(final SourceDirectorySet set) {
+    super.setSource(set);
+    this.sourceSet = set;
   }
 }

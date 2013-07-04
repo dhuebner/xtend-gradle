@@ -39,12 +39,12 @@ public class XtendPluginTest {
 	public void testDefaultSettings() {
 		XtendCompile xtendTask = findMainTask();
 		assertTrue(xtendTask.getXtendGenTargetDir().getAbsolutePath()
-				.endsWith("xtend-gen/main"));
+				.endsWith("main/xtend-gen"));
 		assertEquals("xtend-main", xtendTask.getXtendTempDir().getName());
 	
 		XtendCompile xtendTestTask = findTestTask();
 		assertTrue(xtendTestTask.getXtendGenTargetDir().getAbsolutePath()
-				.endsWith("xtend-gen/test"));
+				.endsWith("test/xtend-gen"));
 		assertEquals("xtend-test", xtendTestTask.getXtendTempDir().getName());
 		assertNull(xtendTask.getEncoding());
 	}
@@ -53,12 +53,12 @@ public class XtendPluginTest {
 	public void testSourceFolder() {
 		XtendCompile xtendTask = findMainTask();
 		assertTrue(xtendTask.getXtendGenTargetDir().getAbsolutePath()
-				.endsWith("xtend-gen/main"));
+				.endsWith("main/xtend-gen"));
 		assertEquals("xtend-main", xtendTask.getXtendTempDir().getName());
 		
 		XtendCompile xtendTestTask = findTestTask();
 		assertTrue(xtendTestTask.getXtendGenTargetDir().getAbsolutePath()
-				.endsWith("xtend-gen/test"));
+				.endsWith("test/xtend-gen"));
 		assertEquals("xtend-test", xtendTestTask.getXtendTempDir().getName());
 		assertNull(xtendTask.getEncoding());
 	}
