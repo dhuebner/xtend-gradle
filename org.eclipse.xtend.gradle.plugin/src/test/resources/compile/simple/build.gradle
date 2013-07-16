@@ -1,0 +1,12 @@
+apply plugin: 'java'
+apply plugin: 'xtend'
+apply plugin: 'eclipse'
+
+def xtendVersion = '2.4.2'
+
+dependencies {
+	repositories {
+		mavenCentral()
+	}
+	compile 'org.eclipse.xtend:org.eclipse.xtend.standalone:'+xtendVersion
+}

@@ -1,4 +1,4 @@
-version = '2.4.2-SNAPSHOT'
+version = '2.4.2'
 group = 'org.eclipse.xtend'
 
 apply plugin: 'java'
@@ -11,16 +11,6 @@ targetCompatibility = 1.5
 
 def xtendVersion = version
 
-sourceSets {
-	main { java {  srcDir 'src/main/xtend-gen'  } }
-}
-
-eclipse {
-	project {
-		natures 'org.eclipse.xtext.ui.shared.xtextNature'
-		buildCommand 'org.eclipse.xtext.ui.shared.xtextBuilder'
-	}
-}
 
 //test.debug=true
 
@@ -30,11 +20,11 @@ dependencies {
 		maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
 	}
 
-	compile gradleApi()
 	compile 'org.eclipse.xtext:org.eclipse.xtext.xbase.lib:'+xtendVersion
 	compile 'org.eclipse.xtend:org.eclipse.xtend.lib:'+xtendVersion
 	compile 'org.eclipse.xtend:org.eclipse.xtend.standalone:'+xtendVersion
 	compile 'com.google.inject:guice:3.0'
+    compile gradleApi()
 }
 
 task generatePom << {

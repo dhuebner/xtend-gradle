@@ -8,16 +8,13 @@ import java.util.Collections;
 import java.util.Set;
 
 import org.gradle.api.internal.project.ProjectInternal;
-import org.gradle.api.tasks.TaskCollection;
 import org.gradle.testfixtures.ProjectBuilder;
-import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
-public class XtendPluginTest {
-	private ProjectInternal project;
+public class XtendPluginTest extends AbstractGradleTest {
 
-	@Before
+	@Override
 	public void setUp() {
 		project = (ProjectInternal) ProjectBuilder.builder().build();
 		project.apply(Collections.singletonMap("plugin", "java"));
@@ -38,27 +35,23 @@ public class XtendPluginTest {
 	@Test
 	public void testDefaultSettings() {
 		XtendCompile xtendTask = findMainTask();
-		assertTrue(xtendTask.getXtendGenTargetDir().getAbsolutePath()
-				.endsWith("main/xtend-gen"));
+		assertTrue(xtendTask.getXtendGenTargetDir().getAbsolutePath().endsWith("main/xtend-gen"));
 		assertEquals("xtend-main", xtendTask.getXtendTempDir().getName());
-	
+
 		XtendCompile xtendTestTask = findTestTask();
-		assertTrue(xtendTestTask.getXtendGenTargetDir().getAbsolutePath()
-				.endsWith("test/xtend-gen"));
+		assertTrue(xtendTestTask.getXtendGenTargetDir().getAbsolutePath().endsWith("test/xtend-gen"));
 		assertEquals("xtend-test", xtendTestTask.getXtendTempDir().getName());
 		assertNull(xtendTask.getEncoding());
 	}
-	
+
 	@Test
 	public void testSourceFolder() {
 		XtendCompile xtendTask = findMainTask();
-		assertTrue(xtendTask.getXtendGenTargetDir().getAbsolutePath()
-				.endsWith("main/xtend-gen"));
+		assertTrue(xtendTask.getXtendGenTargetDir().getAbsolutePath().endsWith("main/xtend-gen"));
 		assertEquals("xtend-main", xtendTask.getXtendTempDir().getName());
-		
+
 		XtendCompile xtendTestTask = findTestTask();
-		assertTrue(xtendTestTask.getXtendGenTargetDir().getAbsolutePath()
-				.endsWith("test/xtend-gen"));
+		assertTrue(xtendTestTask.getXtendGenTargetDir().getAbsolutePath().endsWith("test/xtend-gen"));
 		assertEquals("xtend-test", xtendTestTask.getXtendTempDir().getName());
 		assertNull(xtendTask.getEncoding());
 	}
@@ -68,20 +61,8 @@ public class XtendPluginTest {
 	public void testEncoding() {
 		XtendCompile xtendTask = findMainTask();
 		assertNull(xtendTask.getEncoding());
-		project.getTasks().getByName(xtendTask.getName())
-				.setProperty("encoding", "UTF-8");
+		project.getTasks().getByName(xtendTask.getName()).setProperty("encoding", "UTF-8");
 		assertEquals("UTF-8", xtendTask.getEncoding());
 	}
 
-	private TaskCollection<XtendCompile> findCompileXtendTask() {
-		return project.getTasks().withType(XtendCompile.class);
-	}
-
-	private XtendCompile findMainTask() {
-		return findCompileXtendTask().getByName("compileXtend");
-	}
-
-	private XtendCompile findTestTask() {
-		return findCompileXtendTask().getByName("compileTestXtend");
-	}
 }

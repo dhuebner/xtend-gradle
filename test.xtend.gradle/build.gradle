@@ -5,17 +5,16 @@ buildscript {
 	
 	repositories {
 		mavenCentral()
-		maven {
-			url "https://oss.sonatype.org/content/repositories/orgeclipsextend-1001/"
+		flatDir {
+			dirs '/Users/dhuebner/git/xtend-gradle/org.eclipse.xtend.gradle.plugin/build/libs'
 		}
-		flatDir name:':org.eclipse.xtend.gradle.plugin:',dirs:'/Users/dhuebner/git/xtend-gradle/org.eclipse.xtend.gradle.plugin/build/libs'
 	}
 
 	dependencies {
 		classpath 'org.eclipse.xtend:org.eclipse.xtend.standalone:'+ xtendVersion
 		classpath 'org.apache.logging.log4j:log4j:2.0-beta6'
 		classpath 'com.google.inject:guice:3.0'
-		classpath project(':org.eclipse.xtend.gradle.plugin')
+		classpath ':org.eclipse.xtend.gradle.plugin:'+xtendVersion
 	}
 }
 
@@ -34,10 +33,4 @@ dependencies {
 	compile 'org.eclipse.xtend:org.eclipse.xtend.lib:' + project.version
 }
 
-eclipse {
-	project {
-		natures 'org.eclipse.xtext.ui.shared.xtextNature'
-		buildCommand 'org.eclipse.xtext.ui.shared.xtextBuilder'
-	}
-}
 

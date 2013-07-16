@@ -1,4 +1,4 @@
-package org.gradle.test;
+package org.gradle;
 
 public class Person {
 	private final XtendClazz name;
