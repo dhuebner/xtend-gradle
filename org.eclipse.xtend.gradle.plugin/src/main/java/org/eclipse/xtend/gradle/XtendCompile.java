@@ -17,6 +17,7 @@ import org.gradle.api.file.SourceDirectorySet;
 import org.gradle.api.tasks.OutputDirectory;
 import org.gradle.api.tasks.SourceTask;
 import org.gradle.api.tasks.TaskAction;
+import org.gradle.api.tasks.compile.CompileOptions;
 import org.gradle.api.tasks.compile.JavaCompile;
 
 import com.google.inject.Injector;
@@ -27,45 +28,62 @@ import com.google.inject.Injector;
  */
 
 public class XtendCompile extends SourceTask {
-	String encoding;
-	@OutputDirectory
+	private String encoding;
+	private @OutputDirectory
 	File xtendGenTargetDir;
-	File xtendTempDir;
-	FileCollection classpath;
-	Set<File> sourceSet;
+	private File xtendTempDir;
+	private FileCollection classpath;
+	private Set<File> sourceSet;
 	private JavaCompile javacTask;
 
 	@TaskAction
 	protected void compile() {
 		BasicConfigurator.configure();
 		Injector injector = XtendInjectorSingleton.INJECTOR;
-		XtendBatchCompiler compiler = injector.getInstance(XtendBatchCompiler.class);
 
-		String sourceDir = IterableExtensions.join(sourceSet, File.pathSeparator,
-				new Function1<File, String>() {
-
-					public String apply(File p) {
-						return p.getAbsolutePath();
-					}
-				});
+		String sourceDir = asPathString(sourceSet);
 
 		getLogger().info("Source: " + sourceDir);
 		getLogger().info("outputPath: " + xtendGenTargetDir.getAbsolutePath());
 		getLogger().info("classPath: " + classpath.getAsPath());
-		getLogger().info("Encoding: " + compiler.getFileEncoding());
+		getLogger().info("Encoding: " + encoding);
+
+		XtendBatchCompiler compiler = new XtendBatchCompiler() {
+			@Override
+			protected boolean preCompileStubs(File tmpSourceDirectory, File classDirectory) {
+				complianceLevel = javacTask.getTargetCompatibility();
+				return super.preCompileStubs(tmpSourceDirectory, classDirectory);
+			}
+		};
+		injector.injectMembers(compiler);
 
 		compiler.setSourcePath(sourceDir);
 		compiler.setOutputPath(xtendGenTargetDir.getAbsolutePath());
 		compiler.setClassPath(classpath.getAsPath());
+
+		CompileOptions options = javacTask.getOptions();
 		compiler.setTempDirectory(xtendTempDir.getAbsolutePath());
-		
+		compiler.setVerbose(options.isVerbose());
+		compiler.setFileEncoding(options.getEncoding());
+
 		if (encoding != null) {
 			compiler.setFileEncoding(encoding);
 		}
-		if (!compiler.compile()) {
+
+		boolean compile = compiler.compile();
+		setDidWork(compile);
+		if (!compile) {
 			throw new GradleException("Xtend compilation failed.");
 		}
-		getLogger().info("org.eclipse.xtend.gradle.XtendCompile.compile");
+	}
+
+	private String asPathString(Iterable<File> files) {
+		return IterableExtensions.join(files, File.pathSeparator, new Function1<File, String>() {
+
+			public String apply(File p) {
+				return p.getAbsolutePath();
+			}
+		});
 	}
 
 	@SuppressWarnings("unchecked")

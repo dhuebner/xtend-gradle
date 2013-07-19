@@ -3,13 +3,9 @@
  */
 package org.eclipse.xtend.gradle;
 
-import java.io.File;
-import java.util.Set;
-
 import org.gradle.api.Action;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
-import org.gradle.api.file.SourceDirectorySet;
 import org.gradle.api.internal.file.DefaultSourceDirectorySet;
 import org.gradle.api.internal.file.FileResolver;
 import org.gradle.api.internal.plugins.DslObject;
@@ -49,12 +45,12 @@ public class XtendPlugin implements Plugin<Project> {
 				// Setup xtend compiler task
 				XtendCompile xtendTask = project.getTasks().add(taskName, XtendCompile.class);
 				xtendTask.setSource(sourceSet.getJava().getSrcDirs());
-				xtendTask.xtendGenTargetDir = xtendGen.getSrcDirs().iterator().next();
-				xtendTask.xtendTempDir = projectFileResolver.withBaseDir(project.getBuildDir()).resolve(
-						XTEND_DIR_PREFIX + "-" + sourceSet.getName());
+				xtendTask.setXtendGenTargetDir(xtendGen.getSrcDirs().iterator().next());
+				xtendTask.setXtendTempDir(projectFileResolver.withBaseDir(project.getBuildDir()).resolve(
+						XTEND_DIR_PREFIX + "-" + sourceSet.getName()));
 				JavaCompile javacTask = project.getTasks().withType(JavaCompile.class)
 						.getByName(sourceSet.getCompileJavaTaskName());
-				xtendTask.classpath = project.getConfigurations().findByName("compile");
+				xtendTask.setClasspath(project.getConfigurations().findByName("compile"));
 				xtendTask.setJavaTask(javacTask);
 				// adding xtend-gen folder to javac input
 				sourceSet.getJava().srcDir(xtendGen);
